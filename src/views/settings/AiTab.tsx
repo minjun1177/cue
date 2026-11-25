@@ -10,7 +10,7 @@ import {
 } from '../../lib/tauri'
 import { errorMessage, useT } from '../../i18n'
 import { filterChatModels, nextModel, nextVerifyModel } from '../../lib/modelPick'
-import { isLoopbackUrl } from '../../lib/localEndpoint'
+import { isLoopbackUrl, keyOptional } from '../../lib/localEndpoint'
 import {
   PRESETS,
   useSettings,
@@ -319,10 +319,10 @@ export default function AiTab() {
     })
   }
 
-  const useLocalEndpoint = (baseUrl: string) => {
+  const useLocalEndpoint = (preset: 'ollama' | 'custom', baseUrl: string) => {
     cancelLoad()
     stopRealTest()
-    setProvider({ preset: 'custom', baseUrl, model: '' })
+    setProvider({ preset, baseUrl, model: preset === 'ollama' ? PRESETS.ollama.placeholder : '' })
     setModels([])
     setStatus('')
     setStatusKind('idle')
@@ -418,10 +418,10 @@ export default function AiTab() {
                 )}
               </p>
               <div className="mt-2 flex gap-2">
-                <Button onClick={() => useLocalEndpoint('http://127.0.0.1:11434/v1')}>
+                <Button onClick={() => useLocalEndpoint('ollama', PRESETS.ollama.baseUrl)}>
                   Ollama
                 </Button>
-                <Button onClick={() => useLocalEndpoint('http://127.0.0.1:1234/v1')}>
+                <Button onClick={() => useLocalEndpoint('custom', 'http://127.0.0.1:1234/v1')}>
                   LM Studio
                 </Button>
               </div>
@@ -701,7 +701,7 @@ export default function AiTab() {
                 : t('Unavailable', '확인할 수 없음')}
           </span>
         </div>
-        {provider.preset === 'custom' && isLoopbackUrl(provider.baseUrl) && (
+        {keyOptional(provider.preset, provider.baseUrl) && (
           <p className="mt-2 text-xs text-success">
             {t(
               'No API key is required for this loopback endpoint. Leave the key blank.',

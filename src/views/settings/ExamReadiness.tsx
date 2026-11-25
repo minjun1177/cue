@@ -12,7 +12,7 @@ import {
   setTrayVisible,
   testConnection,
 } from '../../lib/tauri'
-import { isLoopbackUrl } from '../../lib/localEndpoint'
+import { keyOptional } from '../../lib/localEndpoint'
 import { useSettings } from '../../stores/settings'
 
 type Check = 'ok' | 'warn' | 'fail' | 'unknown' | 'off'
@@ -87,7 +87,7 @@ export default function ExamReadiness() {
     setChecking(true)
     setMessage('')
     const current = useSettings.getState()
-    const loopback = current.provider.preset === 'custom' && isLoopbackUrl(current.provider.baseUrl)
+    const loopback = keyOptional(current.provider.preset, current.provider.baseUrl)
     const modelReady = current.provider.model.trim().length > 0
     setModel(modelReady ? 'ok' : 'fail')
     try {
@@ -157,7 +157,7 @@ export default function ExamReadiness() {
       <Detail
         title={t('API key', 'API 키')}
         description={
-          provider.preset === 'custom' && isLoopbackUrl(provider.baseUrl)
+          keyOptional(provider.preset, provider.baseUrl)
             ? t('Loopback endpoint · key optional', '루프백 주소 · 키 선택 사항')
             : t('Saved in Windows Credential Manager', 'Windows 자격증명 관리자에 저장됨')
         }

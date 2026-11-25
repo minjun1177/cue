@@ -44,7 +44,7 @@ Windows 10/11 x64 전용 시험 보조 데스크톱 앱. React 19 + Vite + Tailw
 
 ## 불변식
 
-- **보안/네트워크**: 내장 프리셋(opencode/OpenAI/Google/Anthropic)의 키와 캡처는 `ai.rs::validate_base_url` 덕분에 공식 엔드포인트로만 전송된다. 이 검증을 느슨하게 하거나 프리셋 base URL을 사용자 입력으로 덮어쓰게 만들지 말 것. 커스텀 URL은 HTTPS 또는 루프백 HTTP만 허용하고, HTTP 클라이언트는 리다이렉트를 추적하지 않는다(`commands.rs`). 모델 목록 URL 예외는 `models.rs`. 키 없는 요청은 `custom` + 루프백 URL에만 허용하고(`ai.rs::key_may_be_empty`), 원격 HTTPS·내장 프리셋에 빈 키를 허용하지 말 것. 서버·계정·텔레메트리·분석 호출을 추가하지 말 것. API 키는 keyring에만 저장하고 로그·설정 내보내기에 포함하지 말 것.
+- **보안/네트워크**: 내장 프리셋(opencode/OpenAI/Google/Anthropic/Ollama)의 키와 캡처는 `ai.rs::validate_base_url` 덕분에 공식 엔드포인트로만 전송된다. 이 검증을 느슨하게 하거나 프리셋 base URL을 사용자 입력으로 덮어쓰게 만들지 말 것. 커스텀 URL은 HTTPS 또는 루프백 HTTP만 허용하고, HTTP 클라이언트는 리다이렉트를 추적하지 않는다(`commands.rs`). 모델 목록 URL 예외는 `models.rs`. 키 없는 요청은 `custom` 또는 `ollama`(`127.0.0.1:11434` 고정) + 루프백 URL에만 허용하고(`ai.rs::key_may_be_empty`, 프론트는 `localEndpoint.ts::keyOptional`), 원격 HTTPS·내장 프리셋에 빈 키를 허용하지 말 것. 서버·계정·텔레메트리·분석 호출을 추가하지 말 것. API 키는 keyring에만 저장하고 로그·설정 내보내기에 포함하지 말 것.
 - **AI 요청**: OpenCode/Anthropic 네이티브 엔드포인트는 `temperature`를 거부한다. 요청 바디에 넣지 말 것. `extraJson`은 `temperature`, `model`, `messages`, `input`, `contents`, `stream`, `stream_options`를 덮어쓸 수 없다(`ai.rs::merge_extra`). 스트리밍은 서술형·자유 모드에만 쓰고, `stream_options.include_usage`는 공식 OpenAI 프리셋에만 넣는다(OpenCode는 400 위험).
 - **캡처**: 커서가 있는 모니터만, 장변 1920 이하로 축소하고 커서 좌표도 같은 비율로 변환한다. 크롭은 1600×1000, `capture_in_flight`로 중복 실행을 막는다. 픽셀 상한은 40M(`capture::capture_fits`), GDI 비트맵은 `GetDIBits` 전에 DC에서 선택 해제한다.
 - **오버레이 DPI**: 배지/텍스트 크기는 창의 `scale_factor`가 아니라 대상 모니터의 DPI(`windows::monitor_scale`)로 계산한다.

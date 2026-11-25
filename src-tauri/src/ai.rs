@@ -1002,6 +1002,7 @@ pub fn preset_base_url(preset: &str) -> Option<&'static str> {
         "openai" => Some("https://api.openai.com/v1"),
         "google" => Some("https://generativelanguage.googleapis.com/v1beta/openai"),
         "anthropic" => Some("https://api.anthropic.com/v1"),
+        "ollama" => Some("http://127.0.0.1:11434/v1"),
         _ => None,
     }
 }
@@ -1020,7 +1021,8 @@ pub fn is_loopback_host(host: &str) -> bool {
 }
 
 pub fn key_may_be_empty(preset: &str, base_url: &str) -> bool {
-    if preset != "custom" {
+    // The ollama preset is pinned to loopback by validate_base_url.
+    if preset != "custom" && preset != "ollama" {
         return false;
     }
     let Ok(url) = reqwest::Url::parse(base_url.trim_end_matches('/')) else {
@@ -1971,6 +1973,8 @@ mod tests {
         assert!(!key_may_be_empty("custom", "https://api.openai.com/v1"));
         assert!(!key_may_be_empty("openai", "http://127.0.0.1:11434/v1"));
         assert!(!key_may_be_empty("custom", "http://192.168.0.5/v1"));
+        assert!(key_may_be_empty("ollama", "http://127.0.0.1:11434/v1"));
+        assert!(!key_may_be_empty("ollama", "https://api.openai.com/v1"));
     }
 
     #[test]
@@ -2007,10 +2011,12 @@ mod tests {
 
     #[test]
     fn known_presets_only_accept_their_official_base_url() {
-        for preset in ["opencode", "opencode-go", "openai", "google", "anthropic"] {
+        for preset in ["opencode", "opencode-go", "openai", "google", "anthropic", "ollama"] {
             assert!(validate_base_url(preset, preset_base_url(preset).unwrap()).is_ok());
             assert!(validate_base_url(preset, "https://evil.example/v1").is_err());
         }
+        assert!(validate_base_url("ollama", "http://127.0.0.1:1234/v1").is_err());
+        assert_eq!(api_for("ollama", "gemma3"), Api::Chat);
         assert!(validate_base_url("custom", "http://localhost:8000/v1").is_ok());
         assert!(validate_base_url("custom", "https://proxy.example/v1/").is_ok());
         assert!(validate_base_url("custom", "").is_err());

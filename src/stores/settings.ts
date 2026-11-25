@@ -18,6 +18,7 @@ export const PRESETS: Record<string, { label: string; baseUrl: string; placehold
   openai: { label: 'OpenAI', baseUrl: 'https://api.openai.com/v1', placeholder: 'gpt-4o' },
   google: { label: 'Google', baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', placeholder: 'gemini-2.5-flash' },
   anthropic: { label: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1', placeholder: 'claude-sonnet-4-5' },
+  ollama: { label: 'Ollama (local)', baseUrl: 'http://127.0.0.1:11434/v1', placeholder: 'gemma3' },
   custom: { label: 'Custom', baseUrl: '', placeholder: '' },
 }
 

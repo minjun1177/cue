@@ -4,7 +4,7 @@ import ShortcutRecorder from '../../components/ShortcutRecorder'
 import { Button, Field, Group, Input, SectionTitle, Select } from '../../components/ui'
 import { useT } from '../../i18n'
 import { hasApiKey, openTaskbarSettings, setApiKey, trayIconShown } from '../../lib/tauri'
-import { isLoopbackUrl } from '../../lib/localEndpoint'
+import { keyOptional } from '../../lib/localEndpoint'
 import { PRESETS, useSettings } from '../../stores/settings'
 import { useAnswer } from '../../stores/answer'
 import { exit, fade, layoutSpring } from '../../lib/motion'
@@ -84,7 +84,7 @@ export default function Onboarding() {
   const done = () => setOnboarded(true)
   const next = async () => {
     if (step === 2) {
-      const local = provider.preset === 'custom' && isLoopbackUrl(provider.baseUrl)
+      const local = keyOptional(provider.preset, provider.baseUrl)
       const has =
         keyState === 'saved' ||
         (await hasApiKey(provider.preset).catch(() => true)) ||

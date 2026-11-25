@@ -131,6 +131,10 @@ describe('mergeSettings', () => {
       mergeSettings({ provider: { preset: 'custom', baseUrl: 'http://localhost:8000/v1' } })
         .provider.baseUrl,
     ).toBe('http://localhost:8000/v1')
+    expect(
+      mergeSettings({ provider: { preset: 'ollama', baseUrl: 'https://evil.example/v1' } })
+        .provider.baseUrl,
+    ).toBe('http://127.0.0.1:11434/v1')
   })
 
   it('merges stored answer language and level', () => {

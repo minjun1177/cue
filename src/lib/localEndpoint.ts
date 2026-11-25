@@ -10,3 +10,8 @@ export function isLoopbackUrl(raw: string): boolean {
     return false
   }
 }
+
+// Mirrors ai.rs::key_may_be_empty: only loopback endpoints may run without a key.
+export function keyOptional(preset: string, baseUrl: string): boolean {
+  return (preset === 'custom' || preset === 'ollama') && isLoopbackUrl(baseUrl)
+}

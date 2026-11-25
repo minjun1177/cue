@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isLoopbackUrl } from './localEndpoint'
+import { isLoopbackUrl, keyOptional } from './localEndpoint'
 
 describe('isLoopbackUrl', () => {
   it('accepts loopback HTTP and HTTPS endpoints', () => {
@@ -15,5 +15,14 @@ describe('isLoopbackUrl', () => {
     expect(isLoopbackUrl('http://192.168.0.5:8000/v1')).toBe(false)
     expect(isLoopbackUrl('127.0.0.1:11434')).toBe(false)
     expect(isLoopbackUrl('')).toBe(false)
+  })
+})
+
+describe('keyOptional', () => {
+  it('allows a blank key only for loopback custom or ollama endpoints', () => {
+    expect(keyOptional('ollama', 'http://127.0.0.1:11434/v1')).toBe(true)
+    expect(keyOptional('custom', 'http://localhost:1234/v1')).toBe(true)
+    expect(keyOptional('custom', 'https://proxy.example/v1')).toBe(false)
+    expect(keyOptional('openai', 'http://127.0.0.1:11434/v1')).toBe(false)
   })
 })
